@@ -14,10 +14,14 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 
-
-add_executable (ukf_highway src/main.cpp src/ukf.cpp src/tools.cpp src/render/render.cpp)
+add_executable (ukf_highway
+                src/main.cpp
+                src/measurement_model.cpp
+                src/measurement_model_lidar.cpp
+                src/measurement_model_radar.cpp
+                src/motion_model.cpp
+                src/render/render.cpp
+                src/tools.cpp
+                src/ukf.cpp
+                )
 target_link_libraries (ukf_highway ${PCL_LIBRARIES})
-
-
-
-
