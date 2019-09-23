@@ -1,100 +1,83 @@
 #ifndef UKF_H
 #define UKF_H
+#include <Eigen/Dense>
+#include <vector>
 
-#include "Eigen/Dense"
 #include "measurement_package.h"
+#include "motion_model.h"
+#include "measurement_model.h"
+#include "measurement_model_lidar.h"
+#include "measurement_model_radar.h"
 
-class UKF {
+static const double kInitialUncertainty = 1.0F;
+
+/// \brief Implements the Unscented Kalman Filter (UKF)
+class UKF
+{
  public:
-  /**
-   * Constructor
-   */
-  UKF();
+    /// \brief UKF
+    /// \param motion_model reference to the motion model used
+    UKF();
 
-  /**
-   * Destructor
-   */
-  virtual ~UKF();
+    ~UKF();
 
-  /**
-   * ProcessMeasurement
-   * @param meas_package The latest measurement data of either radar or laser
-   */
-  void ProcessMeasurement(MeasurementPackage meas_package);
+    /// \brief returns the current state
+    /// \return the current state
+    const Eigen::VectorXd& getState() const { return x_; }
 
-  /**
-   * Prediction Predicts sigma points, the state, and the state covariance
-   * matrix
-   * @param delta_t Time between k and k+1 in s
-   */
-  void Prediction(double delta_t);
+    /// \brief sets the state to a new value
+    /// \param x new state
+    void setState(const Eigen::VectorXd& x) { x_ = x; }
 
-  /**
-   * Updates the state and the state covariance matrix using a laser measurement
-   * @param meas_package The measurement at k+1
-   */
-  void UpdateLidar(MeasurementPackage meas_package);
+    /// \brief Predicts sigma points, the state, and the state covariance matrix.
+    ///
+    /// \param delta_t Time between k and k+1 in s.
+    void Prediction(double delta_t);
 
-  /**
-   * Updates the state and the state covariance matrix using a radar measurement
-   * @param meas_package The measurement at k+1
-   */
-  void UpdateRadar(MeasurementPackage meas_package);
+    /// \brief ProcessMeasurement
+    ///
+    /// \param meas_package The latest measurement data of either radar or laser.
+    void ProcessMeasurement(const MeasurementPackage& meas_package);
 
+ private:
+    // Motion model
+    MotionModel motion_model_;
 
-  // initially set to false, set to true in first call of ProcessMeasurement
-  bool is_initialized_;
+    // Measurement models
+    MeasurementModelLidar sensor_model_lidar_;
+    MeasurementModelRadar sensor_model_radar_;
 
-  // if this is false, laser measurements will be ignored (except for init)
-  bool use_laser_;
+    // Dimension of the state vector
+    std::size_t n_states_;
 
-  // if this is false, radar measurements will be ignored (except for init)
-  bool use_radar_;
+    // State vector: [pos_x pos_y velocity yaw_angle yaw_rate] in SI units and rad
+    Eigen::VectorXd x_;
 
-  // state vector: [pos1 pos2 vel_abs yaw_angle yaw_rate] in SI units and rad
-  Eigen::VectorXd x_;
+    // State covariance matrix
+    Eigen::MatrixXd P_;
 
-  // state covariance matrix
-  Eigen::MatrixXd P_;
+    // Predicted sigma points
+    std::vector<Eigen::VectorXd> x_sig_pred_;
 
-  // predicted sigma points matrix
-  Eigen::MatrixXd Xsig_pred_;
+    // Lambda parameter
+    double lambda_;
 
-  // time when the state is true, in us
-  long long time_us_;
+    // Weights of sigma points
+    std::vector<double> weights_;
 
-  // Process noise standard deviation longitudinal acceleration in m/s^2
-  double std_a_;
+    // Initialized flag
+    bool is_initialized_;
 
-  // Process noise standard deviation yaw acceleration in rad/s^2
-  double std_yawdd_;
+    // NIS
+    double NIS_lidar_;
+    double NIS_radar_;
 
-  // Laser measurement noise standard deviation position1 in m
-  double std_laspx_;
+    void initialize(const MeasurementPackage& measurement_pack);
 
-  // Laser measurement noise standard deviation position2 in m
-  double std_laspy_;
+    void generateSigmaPoints(const Eigen::VectorXd& x, const Eigen::MatrixXd& P,
+                             std::vector<Eigen::VectorXd>& x_sig);
 
-  // Radar measurement noise standard deviation radius in m
-  double std_radr_;
-
-  // Radar measurement noise standard deviation angle in rad
-  double std_radphi_;
-
-  // Radar measurement noise standard deviation radius change in m/s
-  double std_radrd_ ;
-
-  // Weights of sigma points
-  Eigen::VectorXd weights_;
-
-  // State dimension
-  int n_x_;
-
-  // Augmented state dimension
-  int n_aug_;
-
-  // Sigma point spreading parameter
-  double lambda_;
+    double update(const MeasurementModel& sensor_model, const Eigen::VectorXd& z);
 };
 
-#endif  // UKF_H
+#endif /* UKF_H */

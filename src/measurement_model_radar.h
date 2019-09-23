@@ -43,7 +43,7 @@ public:
     virtual Eigen::MatrixXd getR() const { return R_; }
 
 private:
-    const std::size_t n_observed_states_ = 3U;
+    std::size_t n_observed_states_ = 3U;
     Eigen::MatrixXd R_;
 };
 

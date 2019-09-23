@@ -9,7 +9,6 @@
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using namespace std;
 
 struct lmarker
 {
@@ -52,7 +51,7 @@ class Tools {
     /**
     * A helper method to calculate RMSE.
     */
-    VectorXd CalculateRMSE(const vector<VectorXd> &estimations, const vector<VectorXd> &ground_truth);
+    VectorXd CalculateRMSE(const std::vector<VectorXd> &estimations, const std::vector<VectorXd> &ground_truth);
     void savePcd(typename pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, std::string file);
     pcl::PointCloud<pcl::PointXYZ>::Ptr loadPcd(std::string file);
 
@@ -65,6 +64,11 @@ class Tools {
     /// \param x angle to normalize
     /// \return the normalized angle
     static double normalizeAngle(const double x);
+
+    /// \brief Computes the square root of a matrix
+    /// \param x the input matrix
+    /// \return the square root of x, A, such that x = A' * A
+    static Eigen::MatrixXd sqrt(const Eigen::MatrixXd& x);
 };
 
 #endif /* TOOLS_H_ */

@@ -35,7 +35,7 @@ public:
     virtual Eigen::MatrixXd getR() const = 0;
 
 protected:
-    const std::size_t n_states_;
+    std::size_t n_states_;
 };
 
 #endif // MEASUREMENTMODEL_H
