@@ -20,11 +20,16 @@ public:
     /// \return the Q matrix
     const Eigen::MatrixXd& getQ() const { return Q_; }
 
-    /// \brief Returns the size of the state vector
+    /// \brief Returns the size of the state vector. The state vector is:
+    ///
+    /// [x y v yaw yaw_dot]
+    ///
     /// \return the size of the state vector
     std::size_t getStateVectorSize() const { return kNumberOfStates; }
 
-    /// \brief Returns the size of the augmented vector
+    /// \brief Returns the size of the augmented vector. The augmented state vector is:
+    ///
+    /// [x y v yaw yaw_dot nu_a nu_phi_ddot]
     /// \return the size of the augmented vector
     std::size_t getAugStateVectorSize() const { return kNumberOfStatesAugmented; }
 

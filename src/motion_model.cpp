@@ -5,10 +5,10 @@
 namespace
 {
 // Process noise standard deviation longitudinal acceleration
-constexpr double std_a     = 0.9;   // [m/s^2]
+constexpr double std_a     = 1.0;   // [m/s^2]
 
 // Process noise standard deviation rotational acceleration
-constexpr double std_yawdd = 0.6;  // [rad/s^2]
+constexpr double std_yawdd = 0.8;  // [rad/s^2]
 }  // namespace
 
 MotionModel::MotionModel():

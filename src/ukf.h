@@ -9,8 +9,6 @@
 #include "measurement_model_lidar.h"
 #include "measurement_model_radar.h"
 
-static const double kInitialUncertainty = 1.0F;
-
 /// \brief Implements the Unscented Kalman Filter (UKF)
 class UKF
 {

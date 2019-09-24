@@ -3,6 +3,10 @@
 
 namespace
 {
+constexpr double kInitialUncertaintyXY = 5.0;
+constexpr double kInitialUncertaintyV = 100.0;
+constexpr double kInitialUncertaintyPhi = 0.5;
+constexpr double kInitialUncertaintyPhiDot = 0.5;
 
 std::size_t computeNumberOfSigmaPoints(const std::size_t n_states)
 {
@@ -18,7 +22,7 @@ UKF::UKF() :
     previous_timestamp_(0U),
     n_states_(motion_model_.getStateVectorSize()),
     x_(Eigen::VectorXd::Zero(n_states_)),
-    P_(Eigen::MatrixXd::Identity(n_states_, n_states_) * kInitialUncertainty),
+    P_(Eigen::MatrixXd::Identity(n_states_, n_states_)),
     x_sig_pred_(),
     lambda_(3.0 - static_cast<double>(motion_model_.getAugStateVectorSize())),
     weights_(computeNumberOfSigmaPoints(motion_model_.getAugStateVectorSize())),
@@ -28,6 +32,13 @@ UKF::UKF() :
     NIS_lidar_(0.0),
     NIS_radar_(0.0)
 {
+    // Set initial uncertainty
+    P_(0,0) = kInitialUncertaintyXY;
+    P_(1,1) = kInitialUncertaintyXY;
+    P_(2,2) = kInitialUncertaintyV;
+    P_(3,3) = kInitialUncertaintyPhi;
+    P_(4,4) = kInitialUncertaintyPhiDot;
+
     // Precompute weights
     const std::size_t n_states_augmented = motion_model_.getAugStateVectorSize();
     weights_[0] = lambda_ / (lambda_ + n_states_augmented);
