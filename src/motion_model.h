@@ -3,12 +3,6 @@
 
 #include <Eigen/Dense>
 
-/// Process noise standard deviation longitudinal acceleration
-static const double std_a_     = 0.8;   // [m/s^2]
-
-/// Process noise standard deviation rotational acceleration
-static const double std_yawdd_ = 0.6;  // [rad/s^2]
-
 /// \brief Implements the motion model
 class MotionModel
 {

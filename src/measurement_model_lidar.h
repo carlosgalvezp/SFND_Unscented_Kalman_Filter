@@ -3,12 +3,6 @@
 
 #include "measurement_model.h"
 
-/// Laser measurement noise standard deviation - px
-static const double std_px_ = 0.15;  // [m]^2
-
-/// Laser measurement noise standard deviation - py
-static const double std_py_ = 0.15;  // [m]^2
-
 /// \brief Implements a Lidar sensor model
 class MeasurementModelLidar : public MeasurementModel
 {

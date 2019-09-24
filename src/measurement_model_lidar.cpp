@@ -1,11 +1,20 @@
 #include "measurement_model_lidar.h"
 
+namespace
+{
+// Laser measurement noise standard deviation - px
+constexpr double std_px = 0.15;  // [m]^2
+
+// Laser measurement noise standard deviation - py
+constexpr double std_py = 0.15;  // [m]^2
+}  // namespace
+
 MeasurementModelLidar::MeasurementModelLidar(std::size_t n_states):
     MeasurementModel(n_states),
     R_(Eigen::MatrixXd::Zero(n_observed_states_, n_observed_states_))
 {
-    R_(0, 0) = std_px_ * std_px_;
-    R_(1, 1) = std_py_ * std_py_;
+    R_(0, 0) = std_px * std_px;
+    R_(1, 1) = std_py * std_py;
 }
 
 MeasurementModelLidar::~MeasurementModelLidar()

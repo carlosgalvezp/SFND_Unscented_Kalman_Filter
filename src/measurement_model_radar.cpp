@@ -2,13 +2,25 @@
 #include "tools.h"
 #include <cmath>
 
+namespace
+{
+// Radar measurement noise standard deviation - range
+constexpr double std_range      = 0.3;   // [m]
+
+// Radar measurement noise standard deviation - bearing
+constexpr double std_bearing    = 0.03;  // [rad]
+
+// Radar measurement noise standard deviation - range-rate
+constexpr double std_range_rate = 0.3;   // [m/s]
+}  // namespace
+
 MeasurementModelRadar::MeasurementModelRadar(const std::size_t n_states):
     MeasurementModel(n_states),
     R_(Eigen::MatrixXd::Zero(n_observed_states_, n_observed_states_))
 {
-    R_(0, 0) = std_range_ * std_range_;
-    R_(1, 1) = std_bearing_ * std_bearing_;
-    R_(2, 2) = std_range_rate_ * std_range_rate_;
+    R_(0, 0) = std_range * std_range;
+    R_(1, 1) = std_bearing * std_bearing;
+    R_(2, 2) = std_range_rate * std_range_rate;
 }
 
 MeasurementModelRadar::~MeasurementModelRadar()

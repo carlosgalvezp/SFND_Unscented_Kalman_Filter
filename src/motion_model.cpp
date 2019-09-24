@@ -2,11 +2,20 @@
 #include <cmath>
 #include "tools.h"
 
+namespace
+{
+// Process noise standard deviation longitudinal acceleration
+constexpr double std_a     = 0.9;   // [m/s^2]
+
+// Process noise standard deviation rotational acceleration
+constexpr double std_yawdd = 0.6;  // [rad/s^2]
+}  // namespace
+
 MotionModel::MotionModel():
     Q_(Eigen::MatrixXd::Zero(kNoiseVectorSize, kNoiseVectorSize))
 {
-    Q_(0, 0) = std_a_ * std_a_;
-    Q_(1, 1) = std_yawdd_ * std_yawdd_;
+    Q_(0, 0) = std_a * std_a;
+    Q_(1, 1) = std_yawdd * std_yawdd;
 }
 
 Eigen::VectorXd MotionModel::predict(const Eigen::VectorXd& x,

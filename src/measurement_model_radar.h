@@ -3,15 +3,6 @@
 
 #include "measurement_model.h"
 
-/// Radar measurement noise standard deviation - range
-static const double std_range_      = 0.3;   // [m]
-
-/// Radar measurement noise standard deviation - bearing
-static const double std_bearing_    = 0.03;  // [rad]
-
-/// Radar measurement noise standard deviation - range-rate
-static const double std_range_rate_ = 0.3;   // [m/s]
-
 /// \brief Implements a radar sensor model
 class MeasurementModelRadar : public MeasurementModel
 {
