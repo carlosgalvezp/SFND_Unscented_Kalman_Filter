@@ -15,6 +15,7 @@ UKF::UKF() :
     motion_model_(),
     sensor_model_lidar_(motion_model_.getStateVectorSize()),
     sensor_model_radar_(motion_model_.getStateVectorSize()),
+    previous_timestamp_(0U),
     n_states_(motion_model_.getStateVectorSize()),
     x_(Eigen::VectorXd::Zero(n_states_)),
     P_(Eigen::MatrixXd::Identity(n_states_, n_states_) * kInitialUncertainty),
@@ -22,6 +23,8 @@ UKF::UKF() :
     lambda_(3.0 - static_cast<double>(motion_model_.getAugStateVectorSize())),
     weights_(computeNumberOfSigmaPoints(motion_model_.getAugStateVectorSize())),
     is_initialized_(false),
+    use_laser_(true),
+    use_radar_(true),
     NIS_lidar_(0.0),
     NIS_radar_(0.0)
 {
@@ -78,8 +81,37 @@ void UKF::Prediction(const double delta_t)
     }
 }
 
+void UKF::ProcessMeasurement(const MeasurementPackage& meas_package)
+{
+    // Initialize
+    if (!is_initialized_)
+    {
+        initialize(meas_package);
+        return;
+    }
+
+    // Predict
+    const std::size_t new_timestamp = meas_package.timestamp_;
+    const double delta_t = static_cast<double>(new_timestamp - previous_timestamp_) * kMicroSecToSec;
+
+    Prediction(delta_t);
+
+    previous_timestamp_ = new_timestamp;
+
+    // Update
+    if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_)
+    {
+        NIS_lidar_ = update(sensor_model_lidar_, meas_package.raw_measurements_);
+    }
+    else if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_)
+    {
+        NIS_radar_ = update(sensor_model_radar_, meas_package.raw_measurements_);
+    }
+}
+
 void UKF::initialize(const MeasurementPackage& measurement_pack)
 {
+    // Compute initial state from measurement
     Eigen::VectorXd x0;
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR)
@@ -91,28 +123,11 @@ void UKF::initialize(const MeasurementPackage& measurement_pack)
         x0 = sensor_model_lidar_.computeInitialState(measurement_pack.raw_measurements_);
     }
 
+    // Initialize
     if (Tools::isNotZero(x0.norm()))
     {
         x_ = x0;
         is_initialized_ = true;
-    }
-}
-
-void UKF::ProcessMeasurement(const MeasurementPackage& meas_package)
-{
-    if (!is_initialized_)
-    {
-        initialize(meas_package);
-    }
-
-    // Update
-    if (meas_package.sensor_type_ == MeasurementPackage::LASER)
-    {
-        NIS_lidar_ = update(sensor_model_lidar_, meas_package.raw_measurements_);
-    }
-    else if (meas_package.sensor_type_ == MeasurementPackage::RADAR)
-    {
-        NIS_radar_ = update(sensor_model_radar_, meas_package.raw_measurements_);
     }
 }
 

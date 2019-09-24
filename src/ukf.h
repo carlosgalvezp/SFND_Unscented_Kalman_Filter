@@ -47,6 +47,9 @@ class UKF
     MeasurementModelLidar sensor_model_lidar_;
     MeasurementModelRadar sensor_model_radar_;
 
+    // Timestamp of the last measurement
+    std::size_t previous_timestamp_;
+
     // Dimension of the state vector
     std::size_t n_states_;
 
@@ -67,6 +70,12 @@ class UKF
 
     // Initialized flag
     bool is_initialized_;
+
+    // If this is false, laser measurements will be ignored (except for init)
+    bool use_laser_;
+
+    // If this is false, radar measurements will be ignored (except for init)
+    bool use_radar_;
 
     // NIS
     double NIS_lidar_;
